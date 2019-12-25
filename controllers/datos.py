@@ -71,3 +71,16 @@ class Controlador_BBDD():
     def agregar_servicio(self,servicio):
         consulta="insert into servicios values (?,?,?,NULL)"
         self.consultar(consulta,servicio)
+
+    #registros de facturación
+    def obtener_codigos_registro(self,proyecto):
+        if proyecto=="Ninguno":
+            consulta="select CODIGO from registros where PROYECTO='Ninguno'"
+        else:
+            consulta="select CODIGO from registros where not PROYECTO='Ninguno'"
+        resultados=self.consultar(consulta)
+        return resultados
+    
+    def agregar_registro(self,registro):
+        consulta="insert into registros values (NULL,?,?,?,?,?,?,?,?,?,?,?,?)"
+        self.consultar(consulta,registro)

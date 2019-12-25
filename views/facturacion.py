@@ -3,6 +3,7 @@ from tkinter import ttk
 #importamos los controladores
 from controllers.datos import *
 from controllers.auxiliares import *
+from views.resources.factura import *
 
 class Vista_Facturacion():
     def __init__(self, aplicacion):
@@ -10,6 +11,8 @@ class Vista_Facturacion():
         self.bbdd=Controlador_BBDD()
         #creamos una instancia de los auxiliares
         self.auxiliar=Controlador_Auxiliares()
+        #creamos una instancia a la factura
+        self.factura_pdf=Factura()
         #constantes de la aplicación
         self.mx=5
         self.my=5
@@ -25,6 +28,7 @@ class Vista_Facturacion():
         self.var_cantidad=DoubleVar()
         self.var_cu=DoubleVar()
         self.var_costo=DoubleVar()
+        self.var_unidad=StringVar()
         
         #implementación de la interfaz
         self.frame_principal=LabelFrame(self.aplicacion,text="Datos de Facturación")
@@ -34,7 +38,7 @@ class Vista_Facturacion():
         Label(padre,text="Solicitante: ").grid(row=0,column=0,padx=self.mx,pady=self.my,sticky=W)
         Entry(padre,textvariable=self.var_solicitante,width=self.ancho).grid(row=0,column=1,padx=self.mx,pady=self.my,sticky=W+E)
         Label(padre,text="Tipo de Identidad: ").grid(row=1,column=0,padx=self.mx,pady=self.my,sticky=W)
-        self.var_tipoIdentidad=ttk.Combobox(padre,state="readonly",width=self.ancho-3,values=["DNI","Extranjería","RUC"])
+        self.var_tipoIdentidad=ttk.Combobox(padre,state="readonly",width=self.ancho-3,values=["DNI","EXTRANJERÍA","RUC","CARNET"])
         self.var_tipoIdentidad.current(0)
         self.var_tipoIdentidad.grid(row=1,column=1,padx=self.mx,pady=self.my,sticky=W)
         Label(padre,text="Número de Identidad: ").grid(row=2,column=0,padx=self.mx,pady=self.my,sticky=W)
@@ -54,6 +58,8 @@ class Vista_Facturacion():
         self.var_servicio.grid(row=5,column=1,padx=self.mx,pady=self.my,sticky=W+E)
         Label(padre,text="Cantidad: ").grid(row=6,column=0,padx=self.mx,pady=self.my,sticky=W)
         Entry(padre,textvariable=self.var_cantidad,width=self.ancho).grid(row=6,column=1,padx=self.mx,pady=self.my,sticky=W+E)
+        Label(padre,textvariable=self.var_unidad).grid(row=6,column=2,padx=self.mx,pady=self.my,sticky=W)
+
         Label(padre,text="Costo Unitario: ").grid(row=7,column=0,padx=self.mx,pady=self.my,sticky=W)
         Entry(padre,textvariable=self.var_cu,width=self.ancho).grid(row=7,column=1,padx=self.mx,pady=self.my,sticky=W+E)
         Button(padre,text="Total", command=lambda:self.costoTotal()).grid(row=8,column=0,columnspan=2,padx=self.mx,pady=self.my,sticky=W+E)
@@ -65,6 +71,7 @@ class Vista_Facturacion():
 
     def costoUnitario(self,evento):
         servicio=self.bbdd.obtener_servicio(self.var_servicio.get())
+        self.var_unidad.set(servicio[1])
         self.var_cu.set(servicio[2])
 
     def costoTotal(self):
@@ -78,6 +85,7 @@ class Vista_Facturacion():
             resultados.append(dato[0])
         servicio=self.bbdd.obtener_servicio(resultados[0])
         self.var_cu.set(servicio[2])
+        self.var_unidad.set(servicio[1])
         return resultados
     
     def listar_proyectos(self):
@@ -88,7 +96,21 @@ class Vista_Facturacion():
         return resultados
 
     def registrar(self):
+        codigo=self.auxiliar.crearCodigo(self.var_proyecto.get())
+        solicitante=self.var_solicitante.get()
+        tipo=self.var_tipoIdentidad.get()
+        numero=self.var_numeroIdentidad.get()
+        descripcion=self.var_descripcion.get()
+        proyecto=self.var_proyecto.get()
+        servicio=self.var_servicio.get()
+        cantidad=self.var_cantidad.get()
+        unidad=self.var_unidad.get()
+        cu=self.var_cu.get()
+        costo=self.var_costo.get()
         fecha=self.auxiliar.obtenerFecha()
-        codigo=self.auxiliar.crearCodigo()
-        print(fecha,codigo)
+
+        registro=[codigo,solicitante,tipo,numero,descripcion,proyecto,servicio,cantidad,unidad,cu,costo,fecha]
+        self.bbdd.agregar_registro(registro)
+        self.factura_pdf.crear_pdf(registro)
+        print(codigo)
         
