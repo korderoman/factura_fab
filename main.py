@@ -21,7 +21,7 @@ if __name__ == "__main__":
     posicion_y=(alto_pantalla/2)-(alto_programa/2)
 
     aplicacion.geometry("%dx%d+%d+%d"%(ancho_programa,alto_programa,posicion_x,posicion_y))
-    aplicacion.resizable(False,False)
+    #aplicacion.resizable(False,False)
     #Fin de Dimensión de la Aplicación
     index=Vista_Index(aplicacion)
     aplicacion.config(menu=index.menu)

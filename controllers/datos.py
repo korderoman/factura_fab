@@ -84,3 +84,10 @@ class Controlador_BBDD():
     def agregar_registro(self,registro):
         consulta="insert into registros values (NULL,?,?,?,?,?,?,?,?,?,?,?,?)"
         self.consultar(consulta,registro)
+
+    #reportes
+    def obtener_reporte(self,consulta,variables=0):
+        if variables==0:
+            return self.consultar(consulta)
+        else:
+            return self.consultar(consulta,variables)
